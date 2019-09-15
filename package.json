@@ -1,0 +1,34 @@
+{
+  "name": "@naghashyan/ngs-builder",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "bin": {
+    "ngs": "./index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/naghashyan/Naghashyan-PHP-Cms-Core.git"
+  },
+  "author": "Levon Naghashyan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/naghashyan/Naghashyan-PHP-Cms-Core/issues"
+  },
+  "homepage": "https://github.com/naghashyan/Naghashyan-PHP-Cms-Core#readme",
+  "dependencies": {
+    "@babel/cli": "^7.6.0",
+    "@babel/core": "^7.6.0",
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
+    "@babel/plugin-transform-arrow-functions": "^7.2.0",
+    "@babel/plugin-transform-modules-commonjs": "^7.6.0",
+    "@babel/plugin-transform-modules-systemjs": "^7.5.0",
+    "@babel/polyfill": "^7.6.0",
+    "@babel/preset-env": "^7.6.0",
+    "commander": "^3.0.1",
+    "terser": "^4.3.1"
+  }
+}
