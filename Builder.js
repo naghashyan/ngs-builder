@@ -116,38 +116,42 @@ module.exports = class Builder {
    * @return void
    */
   jsBuild() {
-    let builderJson = this.parseBuilderJson();
-    let minyfy = builderJson.compress ? builderJson.compress : true;
-    let buildEs5 = builderJson.es5 ? builderJson.es5 : false;
-    let jsOutDir = path.resolve(process.cwd(), builderJson.out_dir);
-    if(buildEs5){
-      var jsEs5OutDir = path.resolve(process.cwd(), builderJson.es5_out_dir);
-    }
-    let files = [];
-    console.log(builderJson);
-    builderJson.builders.forEach(function (builder) {
-      files = files.concat(builder.files);
-    });
-    files.forEach(function (jsFile) {
-      let outJsFile = path.resolve(jsOutDir, jsFile);
-      let code = fs.readFileSync(path.resolve(process.cwd(), jsFile), "utf8");
+    try {
+      let builderJson = this.parseBuilderJson();
+      let minyfy = builderJson.compress ? builderJson.compress : true;
+      let buildEs5 = builderJson.es5 ? builderJson.es5 : false;
+      let jsOutDir = path.resolve(process.cwd(), builderJson.out_dir);
       if(buildEs5){
-        var es5outJsFile = path.resolve(jsEs5OutDir, jsFile);
-        var es5code = this.buildEs5(code);
+        var jsEs5OutDir = path.resolve(process.cwd(), builderJson.es5_out_dir);
       }
-      fs.mkdirSync(path.dirname(outJsFile), {recursive: true});
-      if(minyfy){
-        var minifyCode = Terser.minify(code).code;
-      }
-      fs.writeFileSync(outJsFile, minifyCode, "utf8");
-      if(buildEs5){
-        fs.mkdirSync(path.dirname(es5outJsFile), {recursive: true});
-        if(minyfy){
-          var minifyCode = Terser.minify(es5code).code;
+      let files = [];
+      console.log(builderJson);
+      builderJson.builders.forEach(function (builder) {
+        files = files.concat(builder.files);
+      });
+      files.forEach(function (jsFile) {
+        let outJsFile = path.resolve(jsOutDir, jsFile);
+        let code = fs.readFileSync(path.resolve(process.cwd(), jsFile), "utf8");
+        if(buildEs5){
+          var es5outJsFile = path.resolve(jsEs5OutDir, jsFile);
+          var es5code = this.buildEs5(code);
         }
-        fs.writeFileSync(es5outJsFile, minifyCode, "utf8");
-      }
-    }.bind(this));
+        fs.mkdirSync(path.dirname(outJsFile), {recursive: true});
+        if(minyfy){
+          var minifyCode = Terser.minify(code).code;
+        }
+        fs.writeFileSync(outJsFile, minifyCode, "utf8");
+        if(buildEs5){
+          fs.mkdirSync(path.dirname(es5outJsFile), {recursive: true});
+          if(minyfy){
+            minifyCode = Terser.minify(es5code).code;
+          }
+          fs.writeFileSync(es5outJsFile, minifyCode, "utf8");
+        }
+      }.bind(this));
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   /**

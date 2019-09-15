@@ -1,6 +1,6 @@
 {
   "name": "@naghashyan/ngs-builder",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "description": "",
   "main": "index.js",
   "bin": {
@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/naghashyan/Naghashyan-PHP-Cms-Core.git"
+    "url": "git+https://github.com/naghashyan/ngs-builder.git"
   },
-  "author": "Levon Naghashyan",
+  "author": "Naghashyan Solutions",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/naghashyan/Naghashyan-PHP-Cms-Core/issues"
+    "url": "https://github.com/naghashyan/ngs-builder/issues"
   },
-  "homepage": "https://github.com/naghashyan/Naghashyan-PHP-Cms-Core#readme",
+  "homepage": "https://github.com/naghashyan/ngs-builder#readme",
   "dependencies": {
     "@babel/cli": "^7.6.0",
     "@babel/core": "^7.6.0",
