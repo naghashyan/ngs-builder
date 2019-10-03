@@ -25,10 +25,11 @@ const Builder = require('./Builder');
 const Converter = require('./Converter');
 let ngsModule = 'default';
 const program = new commander.Command("ngs").usage("[global options] command");
+program.version(require('./package.json').version);
+
 program
   .option('-m, --module <type> ', 'NGS module name')
   .option('-t, --type <type> ', '');
-
 
 program.parse(process.argv);
 if(program.module){
