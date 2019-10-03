@@ -22,19 +22,38 @@
 'use strict';
 const commander = require('commander');
 const Builder = require('./Builder');
+const Converter = require('./Converter');
 let ngsModule = 'default';
-
 const program = new commander.Command("ngs").usage("[global options] command");
 program
-  .option('-b, --build <type> ', 'NGS module name', 'js')
-  .option('-m, --module <type> ', 'NGS module name');
+  .option('-m, --module <type> ', 'NGS module name')
+  .option('-t, --type <type> ', '');
 
 
 program.parse(process.argv);
 if(program.module){
   ngsModule = program.module;
 }
-if(program.build && program.build === 'js'){
+if(process.argv.includes('jupdate')){
   let builder = new Builder(ngsModule);
+  builder.jUpdate();
+  return;
+}
+if(process.argv.includes('build')){
+  let type = 'js';
+  let builder = new Builder(ngsModule);
+  if(program.type === 'js' || program.type === 'less'){
+    type = program.type;
+  }
   builder.jsBuild();
+  return;
+}
+if(process.argv.includes('convert')){
+  let type = 'js';
+  let builder = new Builder(ngsModule);
+  if(program.type === 'js' || program.type === 'less'){
+    type = program.type;
+  }
+  let converter = new Converter();
+  converter.convert();
 }

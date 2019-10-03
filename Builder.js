@@ -23,6 +23,8 @@ const path = require('path');
 const fs = require('fs');
 const Terser = require("terser");
 const babel = require('@babel/core');
+const readdir = require("rrdir");
+const mime = require('mime');
 
 module.exports = class Builder {
   /**
@@ -43,19 +45,25 @@ module.exports = class Builder {
     }
   }
 
+
   /**
    *
    * get ngs module full path
    *
+   * @param module string
+   *
    * @returns {Promise<void> | Promise<string> | * | {parent, index, key}}
    */
-  getModulePath() {
-    if(this.module === this.defaultModule || this.module === 'default' || this.module === ''){
+  getModulePath(module = '') {
+    if(module === ''){
+      module = this.module;
+    }
+    if(module === this.defaultModule || module === 'default' || module === ''){
       return path.resolve(process.cwd());
-    } else if(this.module === 'ngs'){
-      return path.resolve(process.cwd(), 'modules', 'vendor', 'naghashyan', 'ngs-php-framework', 'src');
-    } else if(this.module === 'ngs-cms'){
-      return path.resolve(process.cwd(), 'modules', 'vendor', 'naghashyan', 'ngs-php-cms', 'src');
+    } else if(module === 'ngs'){
+      return path.resolve(process.cwd(), 'vendor', 'naghashyan', 'ngs-php-framework', 'src');
+    } else if(module === 'ngs-cms'){
+      return path.resolve(process.cwd(), 'vendor', 'naghashyan', 'ngs-php-cms', 'src');
     }
     return path.resolve(process.cwd(), 'modules');
   }
@@ -76,8 +84,8 @@ module.exports = class Builder {
    *
    * @returns {Promise<void> | Promise<any> | * | {parent, index, key}}
    */
-  getJsModulePath() {
-    return path.resolve(this.getModulePath(), 'web', 'js');
+  getJsModulePath(module = '') {
+    return path.resolve(this.getModulePath(module), 'web', 'js');
   }
 
   /**
@@ -86,8 +94,8 @@ module.exports = class Builder {
    *
    * @returns {Promise<void> | Promise<any> | * | {parent, index, key}}
    */
-  getBuilderJsonPath() {
-    return path.resolve(this.getModulePath(), 'builder.json');
+  getBuilderJsonPath(module = '') {
+    return path.resolve(this.getJsModulePath(module), 'builder.json');
   }
 
   /**
@@ -108,6 +116,32 @@ module.exports = class Builder {
     }
   }
 
+  jUpdate() {
+    let builderJson = this.parseBuilderJson();
+    builderJson.builders.forEach((builder) => {
+      let outDir = builder.module;
+      let targetDir = this.getJsModulePath(builder.module);
+      if(builder.out_dir){
+        outDir = builder.out_dir;
+      }
+      if(builder.files){
+        this.createFilesSymLink(targetDir, builder.files, outDir);
+        return;
+      }
+
+    });
+
+  }
+
+  createFilesSymLink(targetDir, files, outDir) {
+    let outDirPath = path.resolve(this.getJsModulePath(), outDir);
+    fs.mkdirSync(outDirPath, {recursive: true});
+    files.forEach((jsFile) => {
+      let outJsFile = path.resolve(outDirPath, jsFile);
+      fs.symlinkSync(path.resolve(targetDir, jsFile), outJsFile);
+    });
+  }
+
   /**
    *
    * build ngs framework js files
@@ -116,38 +150,74 @@ module.exports = class Builder {
    * @return void
    */
   jsBuild() {
+
+    let jsFiles = readdir.sync(this.getJsModulePath(), {followSymlinks: true});
     let builderJson = this.parseBuilderJson();
     let minyfy = builderJson.compress ? builderJson.compress : true;
     let buildEs5 = builderJson.es5 ? builderJson.es5 : false;
     let jsOutDir = path.resolve(process.cwd(), builderJson.out_dir);
+    let jsEs5OutDir = '';
     if(buildEs5){
-      var jsEs5OutDir = path.resolve(process.cwd(), builderJson.es5_out_dir);
+      jsEs5OutDir = path.resolve(process.cwd(), builderJson.es5_out_dir);
     }
-    let files = [];
-    console.log(builderJson);
-    builderJson.builders.forEach(function (builder) {
-      files = files.concat(builder.files);
-    });
-    files.forEach(function (jsFile) {
-      let outJsFile = path.resolve(jsOutDir, jsFile);
-      let code = fs.readFileSync(path.resolve(process.cwd(), jsFile), "utf8");
+    jsFiles.forEach((jsFile) => {
+      let jsFilePath = jsFile.path;
+      if(mime.getType(jsFilePath) !== 'application/javascript'){
+        return;
+      }
+      let ngsJsFilePath = jsFilePath.replace(this.getJsModulePath() + '\\', '');
+      let outJsFile = path.resolve(jsOutDir, ngsJsFilePath);
+      if(jsFile.symlink === true){
+        jsFilePath = fs.readlinkSync(jsFilePath);
+      }
+
+      let code = fs.readFileSync(jsFilePath, "utf8");
       if(buildEs5){
-        var es5outJsFile = path.resolve(jsEs5OutDir, jsFile);
+        var es5outJsFile = path.resolve(jsEs5OutDir, ngsJsFilePath);
         var es5code = this.buildEs5(code);
       }
       fs.mkdirSync(path.dirname(outJsFile), {recursive: true});
+      let minifyCode;
       if(minyfy){
-        var minifyCode = Terser.minify(code).code;
+        minifyCode = Terser.minify(code).code;
       }
       fs.writeFileSync(outJsFile, minifyCode, "utf8");
       if(buildEs5){
         fs.mkdirSync(path.dirname(es5outJsFile), {recursive: true});
         if(minyfy){
-          var minifyCode = Terser.minify(es5code).code;
+          minifyCode = Terser.minify(es5code).code;
         }
         fs.writeFileSync(es5outJsFile, minifyCode, "utf8");
       }
-    }.bind(this));
+    });
+  }
+
+  /**
+   *
+   * build ngs framework js files
+   * if set es5 mode true then also convert es6 to es5
+   *
+   * @return Promise
+   */
+  readModuleJsDir() {
+    return new Promise((resolve, reject) => {
+        console.log(this.getJsModulePath());
+        readdir(this.getJsModulePath()).then((files) => {
+            console.log(files);
+            let jsFiles = [];
+            files.forEach((file) => {
+              if(mime.getType(file) === 'application/javascript'){
+                jsFiles.push(file);
+              }
+            });
+            resolve(jsFiles);
+          },
+          (error) => {
+            reject(error);
+          }
+        );
+      }
+    );
   }
 
   /**

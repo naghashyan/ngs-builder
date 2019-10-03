@@ -1,34 +1,41 @@
 {
   "name": "@naghashyan/ngs-builder",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "description": "",
   "main": "index.js",
   "bin": {
     "ngs": "./index.js"
   },
   "scripts": {
+    "start": "node ./index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/naghashyan/Naghashyan-PHP-Cms-Core.git"
+    "url": "git+https://github.com/naghashyan/ngs-builder.git"
   },
-  "author": "Levon Naghashyan",
+  "author": "Naghashyan Solutions",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/naghashyan/Naghashyan-PHP-Cms-Core/issues"
+    "url": "https://github.com/naghashyan/ngs-builder/issues"
   },
-  "homepage": "https://github.com/naghashyan/Naghashyan-PHP-Cms-Core#readme",
+  "homepage": "https://github.com/naghashyan/ngs-builder#readme",
   "dependencies": {
-    "@babel/cli": "^7.6.0",
-    "@babel/core": "^7.6.0",
+    "@babel/cli": "^7.6.2",
+    "@babel/core": "^7.6.2",
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "@babel/plugin-transform-arrow-functions": "^7.2.0",
     "@babel/plugin-transform-modules-commonjs": "^7.6.0",
     "@babel/plugin-transform-modules-systemjs": "^7.5.0",
     "@babel/polyfill": "^7.6.0",
-    "@babel/preset-env": "^7.6.0",
-    "commander": "^3.0.1",
-    "terser": "^4.3.1"
-  }
+    "@babel/preset-env": "^7.6.2",
+    "commander": "^3.0.2",
+    "dotgitignore": "^2.1.0",
+    "ignore": "^5.1.4",
+    "mime": "^2.4.4",
+    "recursive-readdir": "^2.2.2",
+    "rrdir": "^3.2.0",
+    "terser": "^4.3.4"
+  },
+  "devDependencies": {}
 }
