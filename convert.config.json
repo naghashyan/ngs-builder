@@ -1,0 +1,12 @@
+[
+  {
+    "path": "managers/PagingManager",
+    "old_name": "NGS.PagingManager",
+    "name": "PagingManager"
+  },
+  {
+    "path": "util/DialogUtility",
+    "old_name": "NGS.DialogUtility",
+    "name": "DialogUtility"
+  }
+]

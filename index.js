@@ -55,6 +55,6 @@ if(process.argv.includes('convert')){
   if(program.type === 'js' || program.type === 'less'){
     type = program.type;
   }
-  let converter = new Converter();
+  let converter = new Converter(ngsModule);
   converter.convert();
 }
