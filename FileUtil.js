@@ -58,7 +58,7 @@ module.exports = class FileUtil {
     } else if(module === 'ngs-cms'){
       return path.resolve(process.cwd(), 'vendor', 'naghashyan', 'ngs-php-cms', 'src');
     }
-    return path.resolve(process.cwd(), 'modules');
+    return path.resolve(process.cwd(), 'modules', this.module);
   }
 
   /**
