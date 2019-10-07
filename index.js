@@ -29,9 +29,11 @@ program.version(require('./package.json').version);
 
 program
   .option('-m, --module <type> ', 'NGS module name')
-  .option('-t, --type <type> ', '');
+  .option('-t, --type <type> ', '')
+  .option('-d, --dir <dir> ', '');
 
 program.parse(process.argv);
+
 if(program.module){
   ngsModule = program.module;
 }
@@ -55,6 +57,11 @@ if(process.argv.includes('convert')){
   if(program.type === 'js' || program.type === 'less'){
     type = program.type;
   }
+  let ngsItemDir = '';
+  if(program.dir){
+    ngsItemDir = program.dir;
+  }
+  console.log(ngsItemDir);
   let converter = new Converter(ngsModule);
-  converter.convert();
+  converter.convert(ngsItemDir);
 }

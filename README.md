@@ -48,7 +48,7 @@ type=js, less, sass
 
 **convert old NGS load and action to es6 js classes**
 ```
-ngs convert -t `type` -m `module_name`
+ngs convert -t `type` -m `module_name` -d `loads_actions_directory`
 ```
 
 convert.config.json should be placed in the root of NGS project

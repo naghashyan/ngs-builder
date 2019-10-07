@@ -17,7 +17,6 @@
  * file that was distributed with this source code.
  *
  */
-
 'use strict';
 const path = require('path');
 const fs = require('fs');
@@ -45,14 +44,14 @@ module.exports = class Converter {
    *
    * @return void
    */
-  convert(jsDir = 'loads/registration') {
-
+  convert(jsDir = '') {
     let files = readdir.sync(path.resolve(this.fileUtil.getJsModulePath(), jsDir), {followSymlinks: true});
     files.forEach((fileObj) => {
       if(mime.getType(fileObj.path) === 'application/javascript'){
         this.doConvert(fileObj.path);
       }
     });
+    console.log('DONE!');
   }
 
   doConvert(jsPath) {
