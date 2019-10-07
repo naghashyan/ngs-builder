@@ -50,7 +50,7 @@ module.exports = class Builder {
       return this.jsonBuilder;
     }
     try {
-      this.jsonBuilder = this.getJsonFileContent(this.fileUtil.getBuilderJsonPath());
+      this.jsonBuilder = this.fileUtil.getJsonFileContent(this.fileUtil.getBuilderJsonPath());
       return this.jsonBuilder;
     } catch (err) {
       console.error(err);
@@ -62,6 +62,9 @@ module.exports = class Builder {
     builderJson.builders.forEach((builder) => {
       let outDir = builder.module;
       let targetDir = this.fileUtil.getJsModulePath(builder.module);
+      if(builder.source_dir){
+        targetDir = path.resolve(targetDir, builder.source_dir);
+      }
       if(builder.out_dir){
         outDir = builder.out_dir;
       }
@@ -79,7 +82,19 @@ module.exports = class Builder {
     fs.mkdirSync(outDirPath, {recursive: true});
     files.forEach((jsFile) => {
       let outJsFile = path.resolve(outDirPath, jsFile);
-      fs.symlinkSync(path.resolve(targetDir, jsFile), outJsFile);
+      if(fs.existsSync(outJsFile)){
+        return;
+      }
+      let jsSourcePath = path.resolve(targetDir, jsFile);
+      if(!fs.existsSync(jsSourcePath)){
+        console.error('file not exists -->  ' + jsSourcePath);
+        return;
+      }
+      let fullOutDir = path.parse(outJsFile).dir;
+      if(!fs.existsSync(fullOutDir)){
+        fs.mkdirSync(fullOutDir, {recursive: true});
+      }
+      fs.symlinkSync(jsSourcePath, outJsFile);
     });
   }
 
@@ -142,9 +157,7 @@ module.exports = class Builder {
    */
   readModuleJsDir() {
     return new Promise((resolve, reject) => {
-        console.log(this.fileUtil.getJsModulePath());
         readdir(this.fileUtil.getJsModulePath()).then((files) => {
-            console.log(files);
             let jsFiles = [];
             files.forEach((file) => {
               if(mime.getType(file) === 'application/javascript'){
@@ -182,13 +195,6 @@ module.exports = class Builder {
         "@babel/plugin-transform-modules-systemjs"
       ]
     }).code;
-  }
-
-  getJsonFileContent(jsonFilePath) {
-    if(fs.existsSync(jsonFilePath)){
-      return JSON.parse(fs.readFileSync(jsonFilePath));
-    }
-    throw new Error(jsonFilePath + ' file not found');
   }
 
 

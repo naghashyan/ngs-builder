@@ -210,17 +210,10 @@ module.exports = class Converter {
       return this.jsonBuilder;
     }
     try {
-      return this.getJsonFileContent(path.resolve(process.cwd(), 'convert.config.json'));
+      return this.fileUtil.getJsonFileContent(path.resolve(process.cwd(), 'convert.config.json'));
     } catch (e) {
       return null;
     }
-  }
-
-  getJsonFileContent(jsonFilePath) {
-    if(fs.existsSync(jsonFilePath)){
-      return JSON.parse(fs.readFileSync(jsonFilePath));
-    }
-    throw new Error(jsonFilePath + ' file not found');
   }
 
   getFileContent(jsonFilePath) {

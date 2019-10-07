@@ -19,6 +19,7 @@
 
 'use strict';
 const path = require('path');
+const fs = require('fs');
 module.exports = class FileUtil {
   /**
    *
@@ -34,6 +35,7 @@ module.exports = class FileUtil {
       let ngsModuleConfig = this.getJsonFileContent(this.getNgsModuleConfigPath());
       this.defaultModule = ngsModuleConfig.default.default.dir;
     } catch (err) {
+      console.log(err);
       this.defaultModule = '';
     }
   }
@@ -68,7 +70,7 @@ module.exports = class FileUtil {
    * @returns {Promise<void> | Promise<string> | * | {parent, index, key}}
    */
   getNgsModuleConfigPath() {
-    return path.resolve(process.cwd(), 'config', 'modules.json');
+    return path.resolve(process.cwd(), 'conf', 'modules.json');
   }
 
   /**
@@ -89,6 +91,22 @@ module.exports = class FileUtil {
    */
   getBuilderJsonPath(module = '') {
     return path.resolve(this.getJsModulePath(module), 'builder.json');
+  }
+
+
+  /**
+   *
+   * get json encoded file conecnt
+   *
+   * @param jsonFilePath String
+   *
+   * @returns json Object
+   */
+  getJsonFileContent(jsonFilePath) {
+    if(fs.existsSync(jsonFilePath)){
+      return JSON.parse(fs.readFileSync(jsonFilePath));
+    }
+    throw new Error(jsonFilePath + ' file not found');
   }
 
 };
