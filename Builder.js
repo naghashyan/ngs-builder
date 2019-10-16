@@ -174,6 +174,47 @@ module.exports = class Builder {
     );
   }
 
+  minify(builderJsonFile) {
+    try {
+      let builderJson = this.fileUtil.getJsonFileContent(path.resolve(process.cwd(), builderJsonFile));
+      let buildEs5 = builderJson.es5 ? builderJson.es5 : false;
+      let minyfy = builderJson.compress ? builderJson.compress : false;
+      let outJsFile = path.resolve(process.cwd(), builderJson.out_file);
+      let es5outJsFile = path.resolve(process.cwd(), builderJson.es5_out_file);
+      let jsFiles = builderJson.files;
+      let jsCode = '';
+      jsFiles.forEach((jsFile) => {
+        let jsFilePath = path.resolve(process.cwd(), builderJson.source_dir, jsFile);
+        if(mime.getType(jsFilePath) !== 'application/javascript'){
+          return;
+        }
+        jsCode += fs.readFileSync(jsFilePath, "utf8");
+
+      });
+
+      let es5code = '';
+      if(buildEs5){
+        es5code = this.buildEs5(jsCode);
+      }
+      fs.mkdirSync(path.dirname(outJsFile), {recursive: true});
+      let minifyCode;
+      if(minyfy){
+        minifyCode = Terser.minify(jsCode).code;
+      }
+      fs.writeFileSync(outJsFile, minifyCode, "utf8");
+      if(buildEs5){
+        fs.mkdirSync(path.dirname(es5outJsFile), {recursive: true});
+        if(minyfy){
+          minifyCode = Terser.minify(es5code).code;
+        }
+        fs.writeFileSync(es5outJsFile, minifyCode, "utf8");
+      }
+
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   /**
    *
    * conver es6 code to es5 using babel

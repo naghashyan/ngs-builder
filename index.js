@@ -28,8 +28,13 @@ const program = new commander.Command("ngs").usage("[global options] command");
 program.version(require('./package.json').version);
 
 program
+  .option('build', 'build ngs js project')
+  .option('jupdate', 'create symbolic link using builder.json')
+  .option('convert', 'convert old style ngs loads/actions to ES6 classes')
   .option('-m, --module <type> ', 'NGS module name')
-  .option('-t, --type <type> ', '')
+  .option('-t, --type <type> ', '', 'file type')
+  .option('-i, --input [type...]', 'builder.json file')
+  .option('-o, --output <type> ', '')
   .option('-d, --dir <dir> ', '');
 
 program.parse(process.argv);
@@ -64,4 +69,8 @@ if(process.argv.includes('convert')){
   console.log(ngsItemDir);
   let converter = new Converter(ngsModule);
   converter.convert(ngsItemDir);
+}
+if(process.argv.includes('minify')){
+  let _builder = new Builder('');
+  _builder.minify(program.input);
 }

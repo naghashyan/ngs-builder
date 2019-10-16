@@ -69,3 +69,25 @@ convert.config.json should be placed in the root of NGS project
   }
 ]
 ```
+
+**build minify js files**
+```
+ngs minify -i web/js/util/builder.json`
+```
+
+
+**builder.config.json example**
+
+```
+{
+  "es5": true,
+  "source_dir": "web/js/util/out",
+  "out_file": "web/js/ngs/ngs.min.js",
+  "es5_out_file": "web/js/ngs/es5-ngs.min.js",
+  "compress": true,
+  "files": [
+    "NGS.js",
+    "Events.js"
+  ]
+}
+```
