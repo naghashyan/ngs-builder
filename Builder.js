@@ -37,6 +37,7 @@ module.exports = class Builder {
    */
   constructor(module) {
     this.fileUtil = new FileUtil(module);
+    this.jsonBuilder = {};
   }
 
   /**
@@ -45,21 +46,24 @@ module.exports = class Builder {
    *
    * @returns {any | undefined}
    */
-  parseBuilderJson() {
-    if(this.jsonBuilder){
-      return this.jsonBuilder;
+  parseBuilderJson(module) {
+    if(this.jsonBuilder[module]){
+      return this.jsonBuilder[module];
     }
     try {
-      this.jsonBuilder = this.fileUtil.getJsonFileContent(this.fileUtil.getBuilderJsonPath());
-      return this.jsonBuilder;
+      this.jsonBuilder[module] = this.fileUtil.getJsonFileContent(this.fileUtil.getBuilderJsonPath(module));
+      return this.jsonBuilder[module];
     } catch (err) {
       console.error(err);
     }
   }
 
-  jUpdate() {
-    let builderJson = this.parseBuilderJson();
+  jsUpdate(module = '', force = false) {
+    let builderJson = this.parseBuilderJson(module);
     builderJson.builders.forEach((builder) => {
+      if(builder.include){
+        return this.jsUpdate(builder.include, force);
+      }
       let outDir = builder.module;
       let targetDir = this.fileUtil.getJsModulePath(builder.module);
       if(builder.source_dir){
@@ -69,21 +73,23 @@ module.exports = class Builder {
         outDir = builder.out_dir;
       }
       if(builder.files){
-        this.createFilesSymLink(targetDir, builder.files, outDir);
-        return;
+        this.createFilesSymLink(targetDir, builder.files, outDir, force);
       }
 
     });
 
   }
 
-  createFilesSymLink(targetDir, files, outDir) {
+  createFilesSymLink(targetDir, files, outDir, force = false) {
     let outDirPath = path.resolve(this.fileUtil.getJsModulePath(), outDir);
     fs.mkdirSync(outDirPath, {recursive: true});
     files.forEach((jsFile) => {
       let outJsFile = path.resolve(outDirPath, jsFile);
       if(fs.existsSync(outJsFile)){
-        return;
+        if(force === false){
+          return;
+        }
+        fs.unlinkSync(outJsFile);
       }
       let jsSourcePath = path.resolve(targetDir, jsFile);
       if(!fs.existsSync(jsSourcePath)){
@@ -133,7 +139,7 @@ module.exports = class Builder {
         var es5code = this.buildEs5(code);
       }
       fs.mkdirSync(path.dirname(outJsFile), {recursive: true});
-      let minifyCode;
+      let minifyCode = code;
       if(minyfy){
         minifyCode = Terser.minify(code).code;
       }
@@ -197,7 +203,7 @@ module.exports = class Builder {
         es5code = this.buildEs5(jsCode);
       }
       fs.mkdirSync(path.dirname(outJsFile), {recursive: true});
-      let minifyCode;
+      let minifyCode = jsCode;
       if(minyfy){
         minifyCode = Terser.minify(jsCode).code;
       }

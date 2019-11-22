@@ -11,7 +11,7 @@ command list
 
 **update symlink**
 ```
-ngs jupdate -m `module_name`
+ngs jsupdate -m `module_name`
 ```
 **build js**
 ```
@@ -28,6 +28,9 @@ type=js, less, sass
   "es5_out_dir": "htdocs/out/js/es5",
   "compress": true,
   "builders": [
+    {
+      "include": "ngs-cms"
+    }
     {
       "out_dir": "ngs",
       "module": "ngs",

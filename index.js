@@ -29,22 +29,23 @@ program.version(require('./package.json').version);
 
 program
   .option('build', 'build ngs js project')
-  .option('jupdate', 'create symbolic link using builder.json')
+  .option('jsupdate', 'create symbolic link using builder.json')
   .option('convert', 'convert old style ngs loads/actions to ES6 classes')
   .option('-m, --module <type> ', 'NGS module name')
   .option('-t, --type <type> ', '', 'file type')
   .option('-i, --input [type...]', 'builder.json file')
   .option('-o, --output <type> ', '')
+  .option('-f, --force', 'force update clean folder before do update')
   .option('-d, --dir <dir> ', '');
 
 program.parse(process.argv);
-
 if(program.module){
   ngsModule = program.module;
 }
-if(process.argv.includes('jupdate')){
+if(process.argv.includes('jsupdate') || process.argv.includes('jupdate')){
   let builder = new Builder(ngsModule);
-  builder.jUpdate();
+  builder.jsUpdate('', program.force);
+  console.log("DONE!");
   return;
 }
 if(process.argv.includes('build')){
@@ -54,6 +55,7 @@ if(process.argv.includes('build')){
     type = program.type;
   }
   builder.jsBuild();
+  console.log("DONE!");
   return;
 }
 if(process.argv.includes('convert')){
@@ -66,7 +68,6 @@ if(process.argv.includes('convert')){
   if(program.dir){
     ngsItemDir = program.dir;
   }
-  console.log(ngsItemDir);
   let converter = new Converter(ngsModule);
   converter.convert(ngsItemDir);
 }
