@@ -112,15 +112,15 @@ module.exports = class Builder {
    * @return void
    */
   jsBuild() {
-
+    this.jsUpdate();
     let jsFiles = readdir.sync(this.fileUtil.getJsModulePath(), {followSymlinks: true});
     let builderJson = this.parseBuilderJson();
     let minyfy = builderJson.compress ? builderJson.compress : true;
     let buildEs5 = builderJson.es5 ? builderJson.es5 : false;
-    let jsOutDir = path.resolve(process.cwd(), builderJson.out_dir);
+    let jsOutDir = path.resolve(this.fileUtil.getModulePath(), builderJson.out_dir);
     let jsEs5OutDir = '';
     if(buildEs5){
-      jsEs5OutDir = path.resolve(process.cwd(), builderJson.es5_out_dir);
+      jsEs5OutDir = path.resolve(this.fileUtil.getModulePath(), builderJson.es5_out_dir);
     }
     jsFiles.forEach((jsFile) => {
       let jsFilePath = jsFile.path;
@@ -128,6 +128,7 @@ module.exports = class Builder {
         return;
       }
       let ngsJsFilePath = jsFilePath.replace(this.fileUtil.getJsModulePath() + '\\', '');
+      ngsJsFilePath = jsFilePath.replace(this.fileUtil.getJsModulePath() + '/', '');
       let outJsFile = path.resolve(jsOutDir, ngsJsFilePath);
       if(jsFile.symlink === true){
         jsFilePath = fs.readlinkSync(jsFilePath);
