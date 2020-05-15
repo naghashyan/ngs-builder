@@ -3,7 +3,7 @@
  *
  * @author Levon Naghashyan <levon@naghashyan.com>
  * @site https://naghashyan.com
- * @year 2019
+ * @year 2019-2020
  * @package ngs.framework
  * @version 1.0.0
  *
@@ -111,16 +111,25 @@ module.exports = class Builder {
    *
    * @return void
    */
-  jsBuild() {
-    this.jsUpdate();
+  jsBuild(version = null) {
+    if(!this.fileUtil.isModuleExists()){
+      console.error('Error: module not found');
+      return;
+    }
     let jsFiles = readdir.sync(this.fileUtil.getJsModulePath(), {followSymlinks: true});
     let builderJson = this.parseBuilderJson();
+    if(!version){
+      version = '1.0.0';
+      if(builderJson.version){
+        version = builderJson.version;
+      }
+    }
     let minyfy = builderJson.compress ? builderJson.compress : true;
     let buildEs5 = builderJson.es5 ? builderJson.es5 : false;
     let jsOutDir = path.resolve(this.fileUtil.getModulePath(), builderJson.out_dir);
     let jsEs5OutDir = '';
     if(buildEs5){
-      jsEs5OutDir = path.resolve(this.fileUtil.getModulePath(), builderJson.es5_out_dir);
+      jsEs5OutDir = path.resolve(process.cwd(), builderJson.es5_out_dir);
     }
     jsFiles.forEach((jsFile) => {
       let jsFilePath = jsFile.path;
@@ -128,17 +137,23 @@ module.exports = class Builder {
         return;
       }
       let ngsJsFilePath = jsFilePath.replace(this.fileUtil.getJsModulePath() + '\\', '');
-      ngsJsFilePath = jsFilePath.replace(this.fileUtil.getJsModulePath() + '/', '');
       let outJsFile = path.resolve(jsOutDir, ngsJsFilePath);
       if(jsFile.symlink === true){
         jsFilePath = fs.readlinkSync(jsFilePath);
       }
 
       let code = fs.readFileSync(jsFilePath, "utf8");
-      if(buildEs5){
-        var es5outJsFile = path.resolve(jsEs5OutDir, ngsJsFilePath);
-        var es5code = this.buildEs5(code);
+      code = code.replace(/(import .*\.js)/gm, '$1?' + version);
+      if(jsFilePath.indexOf('NGS.js')){
+        code = code.replace('import(ngsItemPath', 'import(ngsItemPath?' + version);
       }
+      let es5outJsFile = '';
+      let es5code = '';
+      if(buildEs5){
+        es5outJsFile = path.resolve(jsEs5OutDir, ngsJsFilePath);
+        es5code = this.buildEs5(code);
+      }
+      console.log(outJsFile + '  ===> DONE');
       fs.mkdirSync(path.dirname(outJsFile), {recursive: true});
       let minifyCode = code;
       if(minyfy){

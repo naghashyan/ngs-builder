@@ -4,7 +4,7 @@
  *
  * @author Levon Naghashyan <levon@naghashyan.com>
  * @site https://naghashyan.com
- * @year 2019
+ * @year 2019-2020
  * @package ngs.framework
  * @version 1.0.0
  *
@@ -36,6 +36,7 @@ program
   .option('-i, --input [type...]', 'builder.json file')
   .option('-o, --output <type> ', '')
   .option('-f, --force', 'force update clean folder before do update')
+  .option('-v, --bversion <type>', 'build app version')
   .option('-d, --dir <dir> ', '');
 
 program.parse(process.argv);
@@ -54,7 +55,14 @@ if(process.argv.includes('build')){
   if(program.type === 'js' || program.type === 'less'){
     type = program.type;
   }
-  builder.jsBuild();
+  let buildVersion = null;
+  if(program.bversion){
+    buildVersion = program.bversion;
+  }
+  if(program.v === 'js' || program.type === 'less'){
+    type = program.type;
+  }
+  builder.jsBuild(buildVersion);
   console.log("DONE!");
   return;
 }
