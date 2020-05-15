@@ -1,6 +1,6 @@
 {
   "name": "@naghashyan/ngs-builder",
-  "version": "0.7.0",
+  "version": "0.7.2",
   "description": "",
   "main": "index.js",
   "bin": {
@@ -27,7 +27,7 @@
     "@babel/plugin-transform-arrow-functions": "^7.2.0",
     "@babel/plugin-transform-modules-commonjs": "^7.6.0",
     "@babel/plugin-transform-modules-systemjs": "^7.5.0",
-    "@babel/polyfill": "^7.9.0",
+    "@babel/polyfill": "^7.6.0",
     "@babel/preset-env": "^7.6.2",
     "commander": "^3.0.2",
     "dotgitignore": "^2.1.0",
