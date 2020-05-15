@@ -3,7 +3,7 @@
  *
  * @author Levon Naghashyan <levon@naghashyan.com>
  * @site https://naghashyan.com
- * @year 2019
+ * @year 2019-2020
  * @package ngs.framework
  * @version 1.0.0
  *
@@ -61,6 +61,15 @@ module.exports = class FileUtil {
       return path.resolve(process.cwd(), 'vendor', 'naghashyan', 'ngs-php-cms', 'src');
     }
     return path.resolve(process.cwd(), 'modules', this.module);
+  }
+
+  /**
+   * check if module exists
+   * @param module
+   */
+  isModuleExists(module = '') {
+    return fs.existsSync(this.getModulePath(module));
+
   }
 
   /**
