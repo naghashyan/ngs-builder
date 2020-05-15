@@ -127,6 +127,7 @@ module.exports = class Builder {
     let minyfy = builderJson.compress ? builderJson.compress : true;
     let buildEs5 = builderJson.es5 ? builderJson.es5 : false;
     let jsOutDir = path.resolve(this.fileUtil.getModulePath(), builderJson.out_dir);
+
     let jsEs5OutDir = '';
     if(buildEs5){
       jsEs5OutDir = path.resolve(process.cwd(), builderJson.es5_out_dir);
@@ -137,15 +138,17 @@ module.exports = class Builder {
         return;
       }
       let ngsJsFilePath = jsFilePath.replace(this.fileUtil.getJsModulePath() + '\\', '');
+      ngsJsFilePath = jsFilePath.replace(this.fileUtil.getJsModulePath() + '/', '');
       let outJsFile = path.resolve(jsOutDir, ngsJsFilePath);
       if(jsFile.symlink === true){
         jsFilePath = fs.readlinkSync(jsFilePath);
       }
 
       let code = fs.readFileSync(jsFilePath, "utf8");
-      code = code.replace(/(import .*\.js)/gm, '$1?' + version);
-      if(jsFilePath.indexOf('NGS.js')){
-        code = code.replace('import(ngsItemPath', 'import(ngsItemPath?' + version);
+      code = code.replace(/(import.*?\.js)/gm, '$1?' + version);
+
+      if(jsFilePath.indexOf('NGS.js') > 0){
+        code = code.replace(/import\(([^\)]+)\)/gm, "import($1+'?"+version+"')");
       }
       let es5outJsFile = '';
       let es5code = '';
