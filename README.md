@@ -15,13 +15,14 @@ ngs jsupdate -m `module_name`
 ```
 **build js**
 ```
-ngs build -t `type` -m `module_name`
+ngs build -t `type` -m `module_name` -v `build app version`
 ```
 type=js, less, sass
 
 **JS builder.json file example**
 ```
 {
+  "version": "1.0.0",  
   "source_dir": "",
   "es5": true,
   "out_dir": "out/js",
