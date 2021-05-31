@@ -111,7 +111,7 @@ module.exports = class Builder {
    *
    * @return void
    */
-  jsBuild(version = null) {
+  async jsBuild(version = null) {
     if(!this.fileUtil.isModuleExists()){
       console.error('Error: module not found');
       return;
@@ -132,7 +132,7 @@ module.exports = class Builder {
     if(buildEs5){
       jsEs5OutDir = path.resolve(process.cwd(), builderJson.es5_out_dir);
     }
-    jsFiles.forEach((jsFile) => {
+    jsFiles.forEach(async (jsFile) => {
       let jsFilePath = jsFile.path;
       if(mime.getType(jsFilePath) !== 'application/javascript'){
         return;
@@ -148,7 +148,7 @@ module.exports = class Builder {
       code = code.replace(/(import.*?\.js)/gm, '$1?' + version);
 
       if(jsFilePath.indexOf('NGS.js') > 0){
-        code = code.replace(/import\(([^\)]+)\)/gm, "import($1+'?"+version+"')");
+        code = code.replace(/import\(([^\)]+)\)/gm, "import($1+'?" + version + "')");
       }
       let es5outJsFile = '';
       let es5code = '';
@@ -156,11 +156,18 @@ module.exports = class Builder {
         es5outJsFile = path.resolve(jsEs5OutDir, ngsJsFilePath);
         es5code = this.buildEs5(code);
       }
-      console.log(outJsFile + '  ===> DONE');
+      //
       fs.mkdirSync(path.dirname(outJsFile), {recursive: true});
       let minifyCode = code;
       if(minyfy){
-        minifyCode = Terser.minify(code).code;
+        try {
+          minifyCode = await Terser.minify(code);
+          minifyCode = minifyCode.code;
+          console.log( outJsFile + '  ===> DONE');
+        } catch (e) {
+          console.error(outJsFile + '  ===> ERROR');
+        }
+
       }
       fs.writeFileSync(outJsFile, minifyCode, "utf8");
       if(buildEs5){
@@ -210,6 +217,7 @@ module.exports = class Builder {
       let jsCode = '';
       jsFiles.forEach((jsFile) => {
         let jsFilePath = path.resolve(process.cwd(), builderJson.source_dir, jsFile);
+        console.log(jsFilePath);
         if(mime.getType(jsFilePath) !== 'application/javascript'){
           return;
         }
