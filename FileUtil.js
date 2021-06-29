@@ -18,9 +18,10 @@
  */
 
 'use strict';
-const path = require('path');
-const fs = require('fs');
-module.exports = class FileUtil {
+import path from 'path';
+import fs from 'fs';
+
+export default class FileUtil {
   /**
    *
    * init builder

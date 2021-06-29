@@ -4,7 +4,7 @@
  *
  * @author Levon Naghashyan <levon@naghashyan.com>
  * @site https://naghashyan.com
- * @year 2019-2020
+ * @year 2019-2021
  * @package ngs.framework
  * @version 1.0.0
  *
@@ -20,66 +20,123 @@
 
 
 'use strict';
-const commander = require('commander');
-const Builder = require('./Builder');
-const Converter = require('./Converter');
-let ngsModule = 'default';
-const program = new commander.Command("ngs").usage("[global options] command");
-program.version(require('./package.json').version);
+import {readFile} from 'fs/promises';
+import Builder from './Builder.js';
+import Converter from './Converter.js';
+import {Command} from 'commander/esm.mjs';
 
-program
-  .option('build', 'build ngs js project')
-  .option('jsupdate', 'create symbolic link using builder.json')
-  .option('convert', 'convert old style ngs loads/actions to ES6 classes')
-  .option('-m, --module <type> ', 'NGS module name')
-  .option('-t, --type <type> ', '', 'file type')
-  .option('-i, --input [type...]', 'builder.json file')
-  .option('-o, --output <type> ', '')
-  .option('-f, --force', 'force update clean folder before do update')
-  .option('-v, --bversion <type>', 'build app version')
-  .option('-d, --dir <dir> ', '');
+export default class NgsBuilder {
+  #ngsBuildOptions = {
+    'module': 'default',
+    'version': '1.0.0',
+    'force': true,
+    'type': 'js',
+    'dir': ''
+  };
 
-program.parse(process.argv);
-if(program.module){
-  ngsModule = program.module;
-}
-if(process.argv.includes('jsupdate') || process.argv.includes('jupdate')){
-  let builder = new Builder(ngsModule);
-  builder.jsUpdate('', program.force);
-  console.log("DONE!");
-  return;
-}
-if(process.argv.includes('build')){
-  let type = 'js';
-  let builder = new Builder(ngsModule);
-  if(program.type === 'js' || program.type === 'less'){
-    type = program.type;
+  constructor() {
+    this.initNgsBuilder();
   }
-  let buildVersion = null;
-  if(program.bversion){
-    buildVersion = program.bversion;
+
+  async initNgsBuilder() {
+    this.program = new Command("ngs").usage("[global options] command");
+    await this.initCommandLineOptions();
+    this.program.parse(process.argv);
+    this.handleCommandLineOption(process.argv);
   }
-  if(program.v === 'js' || program.type === 'less'){
-    type = program.type;
+
+  async initCommandLineOptions() {
+    const json = JSON.parse(await readFile(new URL('./package.json', import.meta.url)));
+    this.program.version(json.version);
+    this.program
+      .option('build', 'build ngs js project')
+      .option('jsupdate', 'create symbolic link using builder.json')
+      .option('convert', 'convert old style ngs loads/actions to ES6 classes')
+      .option('-m, --module <module> ', 'NGS module name')
+      .option('-t, --type <type> ', 'file type')
+      .option('-i, --input <input>', 'builder.json file')
+      .option('-o, --output <output> ', '')
+      .option('-f, --force', 'force update clean folder before do update')
+      .option('-v, --bversion <bversion>', 'build app version')
+      .option('-d, --dir <directory> ', '');
   }
-  builder.jsBuild(buildVersion);
-  console.log("DONE!");
-  return;
+
+  getNgsBuilderOptions() {
+    let options = this.program.opts();
+    if(options.module){
+      this.#ngsBuildOptions.module = options.module;
+    }
+    if(options.type){
+      this.#ngsBuildOptions.type = options.type;
+    }
+    if(options.force){
+      this.#ngsBuildOptions.force = options.force;
+    }
+    if(options.bversion){
+      this.#ngsBuildOptions.version = options.bversion;
+    }
+    if(options.directory){
+      this.#ngsBuildOptions.dir = options.directory;
+    }
+    if(options.input){
+      this.#ngsBuildOptions.input = options.input;
+    }
+    return this.#ngsBuildOptions;
+  }
+
+  handleCommandLineOption(argv) {
+    if(argv.includes('jsupdate')){
+      return this.jsUpdate();
+    }
+    if(argv.includes('build')){
+      return this.build();
+    }
+  }
+
+  jsUpdate() {
+    let ngsBuildOptions = this.getNgsBuilderOptions();
+    let builder = new Builder(ngsBuildOptions);
+    builder.jsUpdate();
+  }
+
+  build() {
+    let ngsBuildOptions = this.getNgsBuilderOptions();
+    if(ngsBuildOptions.type === 'js'){
+      return this.jsBuild(ngsBuildOptions);
+    }
+
+    if(ngsBuildOptions.type === 'sass'){
+      return this.sassBuild(ngsBuildOptions);
+    }
+
+    if(ngsBuildOptions.type === 'less'){
+      return this.lessBuild(ngsBuildOptions);
+    }
+  }
+
+  jsBuild(ngsBuildOptions) {
+    let builder = new Builder(ngsBuildOptions);
+    return builder.jsBuild();
+  }
+
+  sassBuild(ngsBuildOptions) {
+
+  }
+
+  lessBuild(ngsBuildOptions) {
+
+  }
+
+  convert() {
+    let ngsBuildOptions = this.getNgsBuilderOptions();
+    let converter = new Converter(ngsBuildOptions);
+    return converter.convert();
+  }
+
+  minify() {
+    let ngsBuildOptions = this.getNgsBuilderOptions();
+    let builder = new Builder(ngsBuildOptions);
+    return builder.minify();
+  }
 }
-if(process.argv.includes('convert')){
-  let type = 'js';
-  let builder = new Builder(ngsModule);
-  if(program.type === 'js' || program.type === 'less'){
-    type = program.type;
-  }
-  let ngsItemDir = '';
-  if(program.dir){
-    ngsItemDir = program.dir;
-  }
-  let converter = new Converter(ngsModule);
-  converter.convert(ngsItemDir);
-}
-if(process.argv.includes('minify')){
-  let _builder = new Builder('');
-  _builder.minify(program.input);
-}
+new NgsBuilder();

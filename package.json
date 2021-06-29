@@ -1,8 +1,9 @@
 {
   "name": "@naghashyan/ngs-builder",
-  "version": "0.7.6",
+  "version": "0.8.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "bin": {
     "ngs": "./index.js"
   },
@@ -21,21 +22,20 @@
   },
   "homepage": "https://github.com/naghashyan/ngs-builder#readme",
   "dependencies": {
-    "@babel/cli": "^7.6.2",
-    "@babel/core": "^7.6.2",
-    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
-    "@babel/plugin-transform-arrow-functions": "^7.2.0",
-    "@babel/plugin-transform-modules-commonjs": "^7.6.0",
-    "@babel/plugin-transform-modules-systemjs": "^7.5.0",
-    "@babel/polyfill": "^7.6.0",
-    "@babel/preset-env": "^7.6.2",
-    "commander": "^3.0.2",
-    "dotgitignore": "^2.1.0",
-    "ignore": "^5.1.4",
-    "mime": "^2.4.4",
-    "recursive-readdir": "^2.2.2",
-    "rrdir": "^3.2.0",
-    "terser": "^5.6"
+    "@babel/cli": "^7",
+    "@babel/core": "^7",
+    "@babel/plugin-syntax-dynamic-import": "^7",
+    "@babel/plugin-transform-arrow-functions": "^7",
+    "@babel/plugin-transform-modules-commonjs": "^7",
+    "@babel/plugin-transform-modules-systemjs": "^7",
+    "@babel/preset-env": "^7",
+    "commander": "^8",
+    "dotgitignore": "^2",
+    "ignore": "^5",
+    "mime": "^2",
+    "recursive-readdir": "^2",
+    "rrdir": "^8",
+    "terser": "^5"
   },
   "devDependencies": {}
 }

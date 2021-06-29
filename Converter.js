@@ -18,12 +18,14 @@
  *
  */
 'use strict';
-const path = require('path');
-const fs = require('fs');
-const readdir = require("rrdir");
-const mime = require('mime');
-const FileUtil = require('./FileUtil');
-module.exports = class Converter {
+
+import mime from 'mime';
+//import rrdir from 'rrdir';
+import fs from 'fs';
+import path from 'path';
+import FileUtil from './FileUtil.js';
+
+export default class Converter {
 
   /**
    *
@@ -222,4 +224,4 @@ module.exports = class Converter {
     throw new Error(jsonFilePath + ' file not found');
   }
 
-};
+}
