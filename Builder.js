@@ -155,7 +155,7 @@ export default class Builder {
         continue;
       }
       let ngsJsFilePath = '';
-      if(jsFilePath.indexOf('\\')){
+      if(jsFilePath.indexOf('\\') > 0){
         ngsJsFilePath = jsFilePath.replace(this.fileUtil.getJsModulePath() + '\\', '');
       } else{
         ngsJsFilePath = jsFilePath.replace(this.fileUtil.getJsModulePath() + '/', '');
