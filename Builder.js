@@ -166,7 +166,7 @@ export default class Builder {
       }
 
       let code = fs.readFileSync(jsFilePath, "utf8");
-      code = code.replace(/(import.*?\.js)/gm, '$1?' + version);
+      code = code.replace(/(import\s.*?\.js)/gm, '$1?' + version);
 
       if(jsFilePath.indexOf('NGS.js') > 0){
         code = code.replace(/import\(([^\)]+)\)/gm, "import($1+'?" + version + "')");
