@@ -60,6 +60,8 @@ export default class FileUtil {
       return path.resolve(process.cwd(), 'vendor', 'naghashyan', 'ngs-php-framework', 'src');
     } else if(module === 'ngs-cms'){
       return path.resolve(process.cwd(), 'vendor', 'naghashyan', 'ngs-php-cms', 'src');
+    } else if(module === 'ngs-admin-tools'){
+      return path.resolve(process.cwd(), 'vendor', 'naghashyan', 'ngs-admin-tools', 'src');
     }
     return path.resolve(process.cwd(), 'modules', this.module);
   }
