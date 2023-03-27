@@ -51,18 +51,24 @@ export default class FileUtil {
    * @returns {Promise<void> | Promise<string> | * | {parent, index, key}}
    */
   getModulePath(module = '') {
-    if(module === ''){
+    if (module === '') {
       module = this.module;
     }
-    if(module === this.defaultModule || module === 'default' || module === ''){
+    if (module === this.defaultModule || module === 'default' || module === '') {
       return path.resolve(process.cwd());
-    } else if(module === 'ngs'){
+    } else if (module === 'ngs') {
       return path.resolve(process.cwd(), 'vendor', 'naghashyan', 'ngs-php-framework', 'src');
-    } else if(module === 'ngs-cms'){
+    } else if (module === 'ngs-cms') {
       return path.resolve(process.cwd(), 'vendor', 'naghashyan', 'ngs-php-cms', 'src');
-    } else if(module === 'ngs-admin-tools' || module === 'ngs-AdminTools'){
+    } else if (module === 'ngs-admin-tools' || module === 'ngs-AdminTools') {
       return path.resolve(process.cwd(), 'vendor', 'naghashyan', 'ngs-admin-tools', 'src');
+    } else {
+      let vendorPath = path.resolve(process.cwd(), module);
+      if (fs.existsSync(vendorPath)) {
+        return vendorPath;
+      }
     }
+
     return path.resolve(process.cwd(), 'modules', this.module);
   }
 
@@ -92,6 +98,15 @@ export default class FileUtil {
    * @returns {Promise<void> | Promise<any> | * | {parent, index, key}}
    */
   getJsModulePath(module = '') {
+    if (module === 'ngs') {
+      let jsPath = path.resolve(this.getModulePath(module), 'web', 'js', 'ngs');
+      if (fs.existsSync(jsPath)) {
+        return jsPath;
+      }
+      return path.resolve(this.getModulePath(module), 'web', 'js');
+    } else if (module === 'ngs-component') {
+      path.resolve(this.getModulePath(module), 'web', 'js', 'ngs-component');
+    }
     return path.resolve(this.getModulePath(module), 'web', 'js');
   }
 
@@ -115,7 +130,7 @@ export default class FileUtil {
    * @returns json Object
    */
   getJsonFileContent(jsonFilePath) {
-    if(fs.existsSync(jsonFilePath)){
+    if (fs.existsSync(jsonFilePath)) {
       return JSON.parse(fs.readFileSync(jsonFilePath));
     }
     throw new Error(jsonFilePath + ' file not found');

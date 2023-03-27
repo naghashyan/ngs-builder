@@ -57,7 +57,7 @@ export default class Builder {
    * @returns {any | undefined}
    */
   parseBuilderJson(module) {
-    if(this.jsonBuilder[module]){
+    if (this.jsonBuilder[module]) {
       return this.jsonBuilder[module];
     }
     try {
@@ -70,23 +70,23 @@ export default class Builder {
 
   jsUpdate(module = null) {
     let ngsModule = this.#ngsBuildOptions.module;
-    if(module){
+    if (module) {
       ngsModule = module;
     }
     let builderJson = this.parseBuilderJson(ngsModule);
     builderJson.builders.forEach((builder) => {
-      if(builder.include){
-        return this.jsUpdate(builder.include, this.#ngsBuildOptions.force);
+      if (builder.include) {
+        return this.jsUpdate(builder.include);
       }
       let outDir = builder.module;
       let targetDir = this.fileUtil.getJsModulePath(builder.module);
-      if(builder.source_dir){
+      if (builder.source_dir) {
         targetDir = path.resolve(targetDir, builder.source_dir);
       }
-      if(builder.out_dir){
+      if (builder.out_dir) {
         outDir = builder.out_dir;
       }
-      if(builder.files){
+      if (builder.files) {
         this.createFilesSymLink(targetDir, builder.files, outDir, this.#ngsBuildOptions.force);
       }
 
@@ -99,19 +99,20 @@ export default class Builder {
     fs.mkdirSync(outDirPath, {recursive: true});
     files.forEach((jsFile) => {
       let outJsFile = path.resolve(outDirPath, jsFile);
-      if(fs.existsSync(outJsFile)){
-        if(force === false){
+      if (fs.existsSync(outJsFile)) {
+        if (force === false) {
           return;
         }
         fs.unlinkSync(outJsFile);
       }
       let jsSourcePath = path.resolve(targetDir, jsFile);
-      if(!fs.existsSync(jsSourcePath)){
+      if (!fs.existsSync(jsSourcePath)) {
         console.error('file not exists -->  ' + jsSourcePath);
         return;
       }
+      console.log(jsSourcePath + ' ----> created');
       let fullOutDir = path.parse(outJsFile).dir;
-      if(!fs.existsSync(fullOutDir)){
+      if (!fs.existsSync(fullOutDir)) {
         fs.mkdirSync(fullOutDir, {recursive: true});
       }
       fs.symlinkSync(jsSourcePath, outJsFile);
@@ -126,7 +127,7 @@ export default class Builder {
    * @return void
    */
   async jsBuild() {
-    if(!this.fileUtil.isModuleExists()){
+    if (!this.fileUtil.isModuleExists()) {
       console.error('Error: module not found');
       return;
     }
@@ -134,9 +135,9 @@ export default class Builder {
     let jsFiles = readdir.sync(this.fileUtil.getJsModulePath(), {followSymlinks: true});
     let builderJson = this.parseBuilderJson();
     let version = this.#ngsBuildOptions.version;
-    if(!version){
+    if (!version) {
       version = '1.0.0';
-      if(builderJson.version){
+      if (builderJson.version) {
         version = builderJson.version;
       }
     }
@@ -145,42 +146,42 @@ export default class Builder {
     let jsOutDir = path.resolve(this.fileUtil.getModulePath(), builderJson.out_dir);
 
     let jsEs5OutDir = '';
-    if(buildEs5){
+    if (buildEs5) {
       jsEs5OutDir = path.resolve(process.cwd(), builderJson.es5_out_dir);
     }
     for (let i = 0; i < jsFiles.length; i++) {
       let jsFile = jsFiles[i];
       let jsFilePath = jsFile.path;
-      if(mime.getType(jsFilePath) !== 'application/javascript'){
+      if (mime.getType(jsFilePath) !== 'application/javascript') {
         continue;
       }
       let ngsJsFilePath = '';
-      if(jsFilePath.indexOf('\\') > 0){
+      if (jsFilePath.indexOf('\\') > 0) {
         ngsJsFilePath = jsFilePath.replace(this.fileUtil.getJsModulePath() + '\\', '');
-      } else{
+      } else {
         ngsJsFilePath = jsFilePath.replace(this.fileUtil.getJsModulePath() + '/', '');
       }
       let outJsFile = path.resolve(jsOutDir, ngsJsFilePath);
-      if(jsFile.symlink === true){
+      if (jsFile.symlink === true) {
         jsFilePath = fs.readlinkSync(jsFilePath);
       }
 
       let code = fs.readFileSync(jsFilePath, "utf8");
       code = code.replace(/(import\s.*?\.js)/gm, '$1?' + version);
 
-      if(jsFilePath.indexOf('NGS.js') > 0){
+      if (jsFilePath.indexOf('NGS.js') > 0) {
         code = code.replace(/import\(([^\)]+)\)/gm, "import($1+'?" + version + "')");
       }
       let es5outJsFile = '';
       let es5code = '';
-      if(buildEs5){
+      if (buildEs5) {
         es5outJsFile = path.resolve(jsEs5OutDir, ngsJsFilePath);
         es5code = this.buildEs5(code);
       }
       //
       fs.mkdirSync(path.dirname(outJsFile), {recursive: true});
       let minifyCode = code;
-      if(compress){
+      if (compress) {
         try {
           minifyCode = await minify(code, {
             module: true
@@ -193,9 +194,9 @@ export default class Builder {
 
       }
       fs.writeFileSync(outJsFile, minifyCode, "utf8");
-      if(buildEs5){
+      if (buildEs5) {
         fs.mkdirSync(path.dirname(es5outJsFile), {recursive: true});
-        if(compress){
+        if (compress) {
           minifyCode = minify(es5code).code;
         }
         fs.writeFileSync(es5outJsFile, minifyCode, "utf8");
@@ -215,7 +216,7 @@ export default class Builder {
         readdir(this.fileUtil.getJsModulePath()).then((files) => {
             let jsFiles = [];
             files.forEach((file) => {
-              if(mime.getType(file) === 'application/javascript'){
+              if (mime.getType(file) === 'application/javascript') {
                 jsFiles.push(file);
               }
             });
@@ -241,7 +242,7 @@ export default class Builder {
       jsFiles.forEach((jsFile) => {
         let jsFilePath = path.resolve(process.cwd(), builderJson.source_dir, jsFile);
         console.log(jsFilePath);
-        if(mime.getType(jsFilePath) !== 'application/javascript'){
+        if (mime.getType(jsFilePath) !== 'application/javascript') {
           return;
         }
         jsCode += fs.readFileSync(jsFilePath, "utf8");
@@ -249,18 +250,18 @@ export default class Builder {
       });
 
       let es5code = '';
-      if(buildEs5){
+      if (buildEs5) {
         es5code = this.buildEs5(jsCode);
       }
       fs.mkdirSync(path.dirname(outJsFile), {recursive: true});
       let minifyCode = jsCode;
-      if(compress){
+      if (compress) {
         minifyCode = minify(jsCode).code;
       }
       fs.writeFileSync(outJsFile, minifyCode, "utf8");
-      if(buildEs5){
+      if (buildEs5) {
         fs.mkdirSync(path.dirname(es5outJsFile), {recursive: true});
-        if(compress){
+        if (compress) {
           minifyCode = minify(es5code).code;
         }
         fs.writeFileSync(es5outJsFile, minifyCode, "utf8");
@@ -273,7 +274,7 @@ export default class Builder {
 
   /**
    *
-   * conver es6 code to es5 using babel
+   * convert es6 code to es5 using babel
    *
    * @param code string
    * @returns {*}
