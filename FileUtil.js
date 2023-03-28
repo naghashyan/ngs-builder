@@ -3,7 +3,7 @@
  *
  * @author Levon Naghashyan <levon@naghashyan.com>
  * @site https://naghashyan.com
- * @year 2019-2020
+ * @year 2019-2023
  * @package ngs.framework
  * @version 1.0.0
  *
@@ -98,6 +98,7 @@ export default class FileUtil {
    * @returns {Promise<void> | Promise<any> | * | {parent, index, key}}
    */
   getJsModulePath(module = '') {
+    console.log(module);
     if (module === 'ngs') {
       let jsPath = path.resolve(this.getModulePath(module), 'web', 'js', 'ngs');
       if (fs.existsSync(jsPath)) {
@@ -105,7 +106,7 @@ export default class FileUtil {
       }
       return path.resolve(this.getModulePath(module), 'web', 'js');
     } else if (module === 'ngs-component') {
-      path.resolve(this.getModulePath(module), 'web', 'js', 'ngs-component');
+      return path.resolve(this.getModulePath('ngs'), 'web', 'js', 'ngs-component');
     }
     return path.resolve(this.getModulePath(module), 'web', 'js');
   }
