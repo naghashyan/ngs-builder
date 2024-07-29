@@ -9,6 +9,40 @@ npm install -g @naghashyan/ngs-builder
 
 command list
 
+**watch project**
+```
+ngs watch
+```
+
+**build project**
+```
+ngs web-build
+```
+
+**default ngs.config.json example**
+```
+{
+  "version": "1.0.0",
+  "build": {
+    "source": "src",
+    "appDir": "src/app",
+    "output": "htdocs",
+    "entry": "src/main.js",
+    "watch": true,
+    "ignore": [
+      "src/styles/mixin"
+    ],
+    "browserSync": {
+      "isEnable": false,
+      "reload": true,
+      "port": 3000,
+      "isOpenNewTab": false
+    }
+  }
+}
+```
+
+
 **update symlink**
 ```
 ngs jsupdate -m `module_name`

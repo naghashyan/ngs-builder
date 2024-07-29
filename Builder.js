@@ -3,7 +3,7 @@
  *
  * @author Levon Naghashyan <levon@naghashyan.com>
  * @site https://naghashyan.com
- * @year 2019-2023
+ * @year 2019-2021
  * @package ngs.framework
  * @version 1.0.0
  *
@@ -61,6 +61,7 @@ export default class Builder {
       return this.jsonBuilder[module];
     }
     try {
+      console.log(this.fileUtil.getBuilderJsonPath(module));
       this.jsonBuilder[module] = this.fileUtil.getJsonFileContent(this.fileUtil.getBuilderJsonPath(module));
       return this.jsonBuilder[module];
     } catch (err) {
@@ -274,7 +275,7 @@ export default class Builder {
 
   /**
    *
-   * convert es6 code to es5 using babel
+   * conver es6 code to es5 using babel
    *
    * @param code string
    * @returns {*}

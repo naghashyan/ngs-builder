@@ -1,0 +1,20 @@
+{
+  "version": "1.0.0",
+  "build": {
+    "source": "src",
+    "appDir": "src/app",
+    "output": "htdocs",
+    "entry": "src/main.js",
+    "watch": true,
+    "ignore": [
+      "src/styles/mixin"
+    ],
+    "browserSync": {
+      "isEnable": false,
+      "reload": true,
+      "port": 3000,
+      "uiPort": 3000,
+      "isOpenNewTab": false
+    }
+  }
+}
