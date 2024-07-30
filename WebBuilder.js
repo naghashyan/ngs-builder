@@ -59,6 +59,9 @@ export default class WebBuilder {
         switch (mime.getType(sourceFilePath)) {
             case 'text/x-scss':
                 const compiledStyle = this.buildSass(sourceFilePath, outputFilePath, doCompress);
+                if (!compiledStyle) {
+                    break;
+                }
                 outputFilePath = FileUtil.getInstance().changeFileExtension(outputFilePath, '.css');
                 let outputCssContent = compiledStyle.css;
                 if (includeSourceMap) {
@@ -87,12 +90,18 @@ export default class WebBuilder {
      */
     buildSass(sourceFilePath, outputFilePath, doCompress = false) {
         let style = doCompress ? "compressed" : "expanded";
-        return sass.compile(sourceFilePath, {
-            style: style,
-            sourceMap: true,
-            sourceMapEmbed: true,
-            outFile: outputFilePath,
-        });
+        try {
+            return sass.compile(sourceFilePath, {
+                style: style,
+                sourceMap: true,
+                sourceMapEmbed: true,
+                outFile: outputFilePath,
+            });
+        } catch (e) {
+            console.error(e);
+            return null;
+        }
+
     }
 
 

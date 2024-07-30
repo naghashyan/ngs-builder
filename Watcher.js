@@ -76,6 +76,7 @@ export default class Watcher {
         const ngsConfig = fileUtil.getNgsConfig();
         this.#browserSync = browserSync.create();
         let publicPath = path.resolve(process.cwd(), ngsConfig.build.output);
+        console.log(ngsConfig.build.browserSync.port);
         this.#browserSync.init({
             server: {
                 baseDir: publicPath
@@ -85,7 +86,7 @@ export default class Watcher {
             open: ngsConfig.build.browserSync.isOpenNewTab,
             port: ngsConfig.build.browserSync.port,
             ui: {
-                port: ngsConfig.build.browserSync.isOpenNewTab
+                port: ngsConfig.build.browserSync.uiPort
             },
             callbacks: {
                 ready: function (err, bs) {
