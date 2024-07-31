@@ -75,8 +75,7 @@ export default class Watcher {
         const fileUtil = FileUtil.getInstance();
         const ngsConfig = fileUtil.getNgsConfig();
         this.#browserSync = browserSync.create();
-        let publicPath = path.resolve(process.cwd(), ngsConfig.build.output);
-        console.log(ngsConfig.build.browserSync.port);
+        let publicPath = path.resolve(process.cwd(), ngsConfig.build.browserSync.rootDir);
         this.#browserSync.init({
             server: {
                 baseDir: publicPath

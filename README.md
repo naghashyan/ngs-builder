@@ -34,8 +34,10 @@ ngs web-build
     ],
     "browserSync": {
       "isEnable": false,
+      "rootDir": "src",
       "reload": true,
       "port": 3000,
+      "uiPort": 3000,
       "isOpenNewTab": false
     }
   }
